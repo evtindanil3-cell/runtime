@@ -1,7 +1,7 @@
 package appcourse.taskmangerv2;
 
 public interface TaskManager {
-    void addTaskList(String name, String description, StatusTask status);
+    void addTaskList(Task task);
 
     void updateTaskList(String name, String description, StatusTask status, Long id);
 
@@ -13,7 +13,7 @@ public interface TaskManager {
 
     void deleteTaskListById(Long id);
 
-    void addEpicTaskList(String name);
+    void addEpicTaskList(EpicTask epicTask);
 
     void updateEpicTaskList(String name, Long id);
 
@@ -35,7 +35,7 @@ public interface TaskManager {
 
     void printEpicTaskList(Long id);
 
-    void addSubTaskList(String discription, StatusTask status, Long epicId);
+    void addSubTaskList(SubTask subtask);
 
     void updateEpicStatus(Long epicId);
 }

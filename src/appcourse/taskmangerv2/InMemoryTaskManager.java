@@ -1,4 +1,5 @@
 package appcourse.taskmangerv2;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,8 +14,8 @@ public class InMemoryTaskManager implements TaskManager {
     private InMemoryHistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
-    public void addTaskList(String name, String description, StatusTask status) {
-        Task Task = new Task(name, description, status);
+    public void addTaskList(Task tasks) {
+        Task Task = tasks;
         idListHashMapTask.put(taskIncrement, Task);
         ++taskIncrement;
     }
@@ -50,8 +51,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addEpicTaskList(String name) {
-        EpicTask epicTask = new EpicTask(name, null, null);
+    public void addEpicTaskList(EpicTask task) {
+        EpicTask epicTask = task;
         idListHashMapEpicTask.put(epicTaskIncrement, epicTask);
         ++epicTaskIncrement;
     }
@@ -139,7 +140,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTaskListById(Long id) {
+        SubTask subTask = idListHashMapSubTask.get(id);
+        if (subTask == null) return;
+
+        Long epicId = subTask.getEpicId();
+        EpicTask epic = idListHashMapEpicTask.get(epicId);
+
+        if (epic != null) {
+            epic.getSubtasksIds().remove(id);
+        }
+
         idListHashMapSubTask.remove(id);
+        updateEpicStatus(epicId);
     }
 
     @Override
@@ -150,21 +162,22 @@ public class InMemoryTaskManager implements TaskManager {
 
     }
 
-    @Override
-    public void addSubTaskList(String discription, StatusTask status, Long epicId) {
 
-        if (!idListHashMapEpicTask.containsKey(epicId)) {
-            System.out.println("Epic с id: " + epicId + " не найден!");
+    @Override
+    public void addSubTaskList(SubTask subtask) {
+
+        if (!idListHashMapEpicTask.containsKey(subtask.getEpicId())) {
+            System.out.println("Epic с id: " + subtask.getEpicId() + " не найден!");
             return;
         }
 
-        SubTask subTask = new SubTask(null, discription, status, epicId);
+        SubTask subTask = subtask;
         long subTaskId = subTaskIncrement;
         idListHashMapSubTask.put(subTaskId, subTask);
         subTaskIncrement++;
-        EpicTask epic = idListHashMapEpicTask.get(epicId);
+        EpicTask epic = idListHashMapEpicTask.get(subtask.getEpicId());
         epic.addsubTaskIds(subTaskId);
-        updateEpicStatus(epicId);
+        updateEpicStatus(subtask.getEpicId());
     }
 
     @Override
